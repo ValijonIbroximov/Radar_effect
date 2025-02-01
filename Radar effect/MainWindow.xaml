@@ -4,9 +4,9 @@
         Height="760" Width="1280" Background="Black"
         WindowState="Maximized"
         WindowStyle="None" ResizeMode="NoResize">
-    
-    
-    
+
+
+
     <!-- Trigger for animations -->
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
@@ -28,115 +28,130 @@
     </Window.InputBindings>
 
     <Grid>
+        <StackPanel 
+        HorizontalAlignment="Right" 
+        Background="Gray" 
+        Width="300" Margin="0,20,0,0">
+            <GroupBox Height="80" Width="284">
+                <GroupBox.Header>
+                    <Label Foreground="LimeGreen" FontWeight="Bold">Antenna rotation rate</Label>
+                </GroupBox.Header>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
+                    <Button Content="2" HorizontalAlignment="Left" Height="40" Margin="15,0,0,0" 
+                VerticalAlignment="Center" Width="40" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Red"/>
+                    <Button Content="3" HorizontalAlignment="Left" Height="40" Margin="25,0,0,0" 
+                VerticalAlignment="Center" Width="40" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Red"/>
+                    <Button Content="4" HorizontalAlignment="Left" Height="40" Margin="25,0,0,0" 
+                VerticalAlignment="Center" Width="40" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="LimeGreen"/>
+                    <Button Content="5" Height="40" Margin="25,0,0,0"
+                VerticalAlignment="Center" Width="40" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Red"/>
+                </StackPanel>
+            </GroupBox>
+
+            <!-- StackPanel ichidagi elementlar -->
+        </StackPanel>
         <Menu Height="20" VerticalAlignment="Top" Background="LightGray">
             <MenuItem Header="File">
-                <MenuItem Header="Load" Name="MenuLoad" InputGestureText="Ctrl+L">
+                <MenuItem Header="Load" x:Name="MenuLoad" InputGestureText="Ctrl+L">
                     <MenuItem.ToolTip>
-                        <ToolTip>Load a file</ToolTip>
+                        <ToolTip Content="Load a file"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Start">
                     <MenuItem.ToolTip>
-                        <ToolTip>Start the process</ToolTip>
+                        <ToolTip Content="Start the process"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Reset">
                     <MenuItem.ToolTip>
-                        <ToolTip>Reset the application</ToolTip>
+                        <ToolTip Content="Reset the application"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Quit" InputGestureText="Ctrl+Q" Click="MenuQuit_Click">
                     <MenuItem.ToolTip>
-                        <ToolTip>Exit the application</ToolTip>
+                        <ToolTip Content="Exit the application"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="View">
                 <MenuItem Header="Full screen" InputGestureText="Ctrl+F">
                     <MenuItem.ToolTip>
-                        <ToolTip>Toggle full screen mode</ToolTip>
+                        <ToolTip Content="Toggle full screen mode"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Coordinates window" InputGestureText="Ctrl+W">
                     <MenuItem.ToolTip>
-                        <ToolTip>Show coordinates window</ToolTip>
+                        <ToolTip Content="Show coordinates window"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Electronic map" InputGestureText="Ctrl+M">
                     <MenuItem.ToolTip>
-                        <ToolTip>Open electronic map</ToolTip>
+                        <ToolTip Content="Open electronic map"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Settings">
                 <MenuItem Header="Options" InputGestureText="Ctrl+O">
                     <MenuItem.ToolTip>
-                        <ToolTip>Configure options</ToolTip>
+                        <ToolTip Content="Configure options"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Time" InputGestureText="Ctrl+T">
                     <MenuItem.ToolTip>
-                        <ToolTip>Set application time</ToolTip>
+                        <ToolTip Content="Set application time"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Language">
                     <MenuItem Header="Default" InputGestureText="Ctrl+D">
                         <MenuItem.ToolTip>
-                            <ToolTip>Set default language</ToolTip>
+                            <ToolTip Content="Set default language"/>
                         </MenuItem.ToolTip>
                     </MenuItem>
                     <MenuItem Header="Uzbek">
                         <MenuItem.ToolTip>
-                            <ToolTip>Switch to Uzbek language</ToolTip>
+                            <ToolTip Content="Switch to Uzbek language"/>
                         </MenuItem.ToolTip>
                     </MenuItem>
                     <MenuItem Header="English">
                         <MenuItem.ToolTip>
-                            <ToolTip>Switch to English language</ToolTip>
+                            <ToolTip Content="Switch to English language"/>
                         </MenuItem.ToolTip>
                     </MenuItem>
                     <MenuItem Header="Русский">
                         <MenuItem.ToolTip>
-                            <ToolTip>Switch to Russian language</ToolTip>
+                            <ToolTip Content="Switch to Russian language"/>
                         </MenuItem.ToolTip>
                     </MenuItem>
                 </MenuItem>
                 <MenuItem Header="Network connections" InputGestureText="Ctrl+N">
                     <MenuItem.ToolTip>
-                        <ToolTip>Manage network connections</ToolTip>
+                        <ToolTip Content="Manage network connections"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Brandmauer windows" InputGestureText="Ctrl+B">
                     <MenuItem.ToolTip>
-                        <ToolTip>Open Windows Firewall settings</ToolTip>
+                        <ToolTip Content="Open Windows Firewall settings"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
             </MenuItem>
             <MenuItem Header="Informations">
                 <MenuItem Header="About" InputGestureText="Ctrl+A">
                     <MenuItem.ToolTip>
-                        <ToolTip>About the application</ToolTip>
+                        <ToolTip Content="About the application"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Help" InputGestureText="F1">
                     <MenuItem.ToolTip>
-                        <ToolTip>Open help documentation</ToolTip>
+                        <ToolTip Content="Open help documentation"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
                 <MenuItem Header="Registration" InputGestureText="Ctrl+R">
                     <MenuItem.ToolTip>
-                        <ToolTip>Register the application</ToolTip>
+                        <ToolTip Content="Register the application"/>
                     </MenuItem.ToolTip>
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <StackPanel 
-        HorizontalAlignment="Right" 
-        VerticalAlignment="Stretch" 
-        Background="Gray" 
-        Width="300">
-            <!-- StackPanel ichidagi elementlar -->
-        </StackPanel>
         <Canvas Margin="0,20,0,0">
             <!-- Radar Circles -->
             <Ellipse Width="400" Height="400" Stroke="Lime" StrokeThickness="1" Canvas.Left="25" Canvas.Top="25" />
@@ -151,13 +166,7 @@
             <!-- Radar Sweep -->
             <Path x:Name="RadarSweep" Fill="LimeGreen" Opacity="0.2">
                 <Path.Data>
-                    <PathGeometry>
-                        <PathFigure StartPoint="225,225">
-                            <LineSegment Point="225,25" />
-                            <ArcSegment Point="425,225" Size="200,200" SweepDirection="Clockwise" />
-                            <LineSegment Point="225,225" />
-                        </PathFigure>
-                    </PathGeometry>
+                    <PathGeometry Figures="M225,225 L225,25 A200,200,0,0,1,425,225 L225,225"/>
                 </Path.Data>
                 <Path.RenderTransform>
                     <RotateTransform x:Name="RadarRotation" CenterX="225" CenterY="225" />

@@ -33,5 +33,10 @@ namespace Radar_effect
         {
             this.Close();
         }
+
+        private void RadioButton_Checked(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

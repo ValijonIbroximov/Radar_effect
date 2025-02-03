@@ -28,6 +28,13 @@
     </Window.InputBindings>
     <!--Antenna rotation rate ////////////////////////////////////////////////////////// -->
     <Grid>
+        <!--Bottom number-->
+        <!--<Button Content="0" Background="Gray"-->
+        <Border BorderBrush="Black" BorderThickness="2" Background="Gray" Padding="0" Margin="0,0,0,10" Width="40" 
+        Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
+            <Label VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="Red" FontWeight="Bold" FontSize="20">0</Label>
+        </Border>
+        <!--Right panel-->
         <StackPanel 
         HorizontalAlignment="Right" 
         Background="Gray" 
@@ -316,6 +323,14 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
             </MenuItem>
         </Menu>
         <Canvas Margin="0,20,0,0">
+            <!-- Date Time Panel with Border -->
+            <Border BorderBrush="White" BorderThickness="2" Background="Black" Padding="10" Margin="5,20,0,0" >
+                <StackPanel Width="120" Height="40">
+                    <Label Content="01.01.2025" x:Name="DateLabel" Foreground="LawnGreen" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"  Margin="0,-10,0,0" />
+                    <Label Content="00 : 00 : 00" x:Name="TimeLabel" Foreground="LawnGreen" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"  Margin="0,-15,0,0" />
+                </StackPanel>
+            </Border>
+            
             <!-- Radar Circles -->
             <Ellipse Width="400" Height="400" Stroke="Lime" StrokeThickness="1" Canvas.Left="25" Canvas.Top="25" />
             <Ellipse Width="300" Height="300" Stroke="Lime" StrokeThickness="1" Canvas.Left="75" Canvas.Top="75" />

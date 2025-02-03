@@ -177,9 +177,12 @@ HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                     <!--status //////////////////////////////////////////////////////////////////-->
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <TextBlock Background="#FFA0A2A2" Height="20" Width="250">
-                            
-                        </TextBlock>
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
+                            <TextBlock Background="#FFA0A2A2" Height="20" Width="220">
+
+                            </TextBlock>
+                            <RadioButton Margin="5,0,0,0" IsEnabled="False"/>
+                        </StackPanel>
                         <Label Content="Status: None" Foreground="Yellow" FontWeight="Bold" FontSize="16" 
         HorizontalAlignment="Left" Margin="0,0,0,30"/>
                     </StackPanel>

@@ -5,8 +5,6 @@
         WindowState="Maximized"
         WindowStyle="None" ResizeMode="NoResize">
 
-
-
     <!-- Trigger for animations -->
     <Window.Triggers>
         <EventTrigger RoutedEvent="Window.Loaded">
@@ -26,7 +24,7 @@
         <KeyBinding Command="ApplicationCommands.Open" Key="L" Modifiers="Control" />
         <KeyBinding Command="{Binding QuitCommand}" Key="Q" Modifiers="Control" />
     </Window.InputBindings>
-    <!--Antenna rotation rate ////////////////////////////////////////////////////////// -->
+
     <Grid>
         <!-- Canvas - Joylashuvni boshqarish uchun qulay -->
         <Canvas HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,110">
@@ -40,7 +38,6 @@
                 X1="50" Y1="50" X2="50" Y2="50"
                 StrokeStartLineCap="Round"
                 StrokeEndLineCap="Round"/>
-
 
             <!-- O'rtadagi doira -->
             <Ellipse x:Name="MiddleCircle" Width="30" Height="30" Fill="Black" Stroke="White" StrokeThickness="2"
@@ -59,11 +56,9 @@
         Height="40" HorizontalAlignment="Center" VerticalAlignment="Bottom">
             <Label VerticalAlignment="Center" HorizontalAlignment="Center" Foreground="LimeGreen" FontWeight="Bold" FontSize="20">0</Label>
         </Border>
+
         <!--Right panel-->
-        <StackPanel 
-        HorizontalAlignment="Right" 
-        Background="Gray" 
-        Width="300" Margin="0,20,0,0">
+        <StackPanel HorizontalAlignment="Right" Background="Gray" Width="300" Margin="0,20,0,0">
             <GroupBox Height="80" Width="284">
                 <GroupBox.Header>
                     <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">Antenna rotation rate</Label>
@@ -79,9 +74,10 @@
     VerticalAlignment="Center" Width="40" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Red"/>
                 </StackPanel>
             </GroupBox>
-            <!--Scale D Marks D ////////////////////////////////////////////////////////////////-->
+
+            <!--Scale D Marks D -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Center">
-                <!--Scale D ////////////////////////////////////////////////////////////////////-->
+                <!--Scale D -->
                 <GroupBox Height="auto" Width="135" Margin="8,0,0,0">
                     <GroupBox.Header>
                         <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">Scale D</Label>
@@ -93,7 +89,7 @@
                     </StackPanel>
                 </GroupBox>
 
-                <!--Marks D ////////////////////////////////////////////////////////////////////-->
+                <!--Marks D -->
                 <GroupBox Height="auto" Width="135" Margin="14,0,0,0">
                     <GroupBox.Header>
                         <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">Marks D</Label>
@@ -105,9 +101,10 @@
                     </StackPanel>
                 </GroupBox>
             </StackPanel>
-            <!--IFF Marks Az ///////////////////////////////////////////////////////////////////////////-->
+
+            <!--IFF Marks Az -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Left" VerticalAlignment="Top">
-                <!--IFF ///////////////////////////////////////////////////////////////////////////-->
+                <!--IFF -->
                 <GroupBox Height="auto" Width="135" Margin="8,0,0,0">
                     <GroupBox.Header>
                         <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">IFF</Label>
@@ -122,7 +119,7 @@ VerticalAlignment="Top" Width="70" Background="Gray" FontWeight="Bold" FontSize=
                     </StackPanel>
                 </GroupBox>
 
-                <!--Marks Az ///////////////////////////////////////////////////////////////////////////-->
+                <!--Marks Az -->
                 <GroupBox Height="auto" Width="135" Margin="14,0,0,0" VerticalAlignment="Top">
                     <GroupBox.Header>
                         <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">Marks Az</Label>
@@ -135,16 +132,14 @@ VerticalAlignment="Top" Width="70" Background="Gray" FontWeight="Bold" FontSize=
                 </GroupBox>
             </StackPanel>
 
-
-
-            <!--Brightness //////////////////////////////////////////////////////////////////////////-->
+            <!--Brightness -->
             <GroupBox Height="auto" Width="284">
                 <GroupBox.Header>
                     <Label Foreground="LimeGreen" FontWeight="Bold" FontSize="16">Brightness</Label>
                 </GroupBox.Header>
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto">
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="auto">
-                        <!--echo ////////////////////////////////////////////-->
+                        <!--echo -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto">
                             <Label Content="Echo" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
         HorizontalAlignment="Left" Margin="0,0,0,5"/>
@@ -152,7 +147,7 @@ VerticalAlignment="Top" Width="70" Background="Gray" FontWeight="Bold" FontSize=
 HorizontalAlignment="Center" VerticalAlignment="Top">
                             </Slider>
                         </StackPanel>
-                        <!--iff ////////////////////////////////////////////////////-->
+                        <!--iff -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto" Margin="30,0,0,0">
                             <Label Content="iff" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
         HorizontalAlignment="Left" Margin="0,0,0,5"/>
@@ -161,30 +156,30 @@ HorizontalAlignment="Center" VerticalAlignment="Top">
                             </Slider>
                         </StackPanel>
                     </StackPanel>
-                    <!-- Az va D //////////////////////////////////////////////////////// -->
+                    <!-- Az va D -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Height="auto">
-                        <!--Az10 //////////////////////////////////////////////////////////-->
+                        <!--Az10 -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto" Margin="0,0,0,0">
                             <Label Content="Az10" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
 HorizontalAlignment="Left" Margin="0,0,0,5"/>
                             <Slider Height="80" Margin="0,0,0,10" Width="30" TickPlacement="BottomRight" 
 HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                         </StackPanel>
-                        <!--Az30 //////////////////////////////////////////////////////////-->
+                        <!--Az30 -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto" Margin="10,0,0,0">
                             <Label Content="Az30" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
 HorizontalAlignment="Left" Margin="0,0,0,5"/>
                             <Slider Height="80" Margin="0,0,0,10" Width="30" TickPlacement="BottomRight" 
 HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                         </StackPanel>
-                        <!--D10 //////////////////////////////////////////////////////////-->
+                        <!--D10 -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto" Margin="30,0,0,0">
                             <Label Content="D10" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
 HorizontalAlignment="Left" Margin="0,0,0,5"/>
                             <Slider Height="80" Margin="0,0,0,10" Width="30" TickPlacement="BottomRight" 
 HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                         </StackPanel>
-                        <!--D50 //////////////////////////////////////////////////////////-->
+                        <!--D50 -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" Height="auto" Margin="10,0,0,0">
                             <Label Content="D50" Foreground="LimeGreen" FontWeight="Bold" FontSize="16" 
 HorizontalAlignment="Left" Margin="0,0,0,5"/>
@@ -192,22 +187,17 @@ HorizontalAlignment="Left" Margin="0,0,0,5"/>
 HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                         </StackPanel>
                     </StackPanel>
-
-                    
-                    
                 </StackPanel>
-                
-                
             </GroupBox>
 
-            <!--Imitator ///////////////////////////////////////////////////////////-->
+            <!--Imitator -->
             <GroupBox Height="auto" Width="284">
                 <GroupBox.Header>
                     <Label Foreground="Yellow" FontWeight="Bold" FontSize="16">Imitator</Label>
                 </GroupBox.Header>
-                <!--Imitator //////////////////////////////////////////////////////////////////-->
+                <!--Imitator -->
                 <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
-                    <!--status //////////////////////////////////////////////////////////////////-->
+                    <!--status -->
                     <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                         <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <TextBlock Background="#FFA0A2A2" Height="20" Width="220">
@@ -218,16 +208,16 @@ HorizontalAlignment="Center" VerticalAlignment="Top" Orientation="Vertical"/>
                         <Label Content="Status: None" Foreground="Yellow" FontWeight="Bold" FontSize="16" 
         HorizontalAlignment="Left" Margin="0,0,0,30"/>
                     </StackPanel>
-                    <!--buttons and Start using //////////////////////////////////////////////////////////////////-->
+                    <!--buttons and Start using -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center">
-                        <!--buttons //////////////////////////////////////////////////////////////////-->
+                        <!--buttons -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center" Margin="0,0,20,0">
                             <Button Content="Start" HorizontalAlignment="Left" Height="40" Margin="0,0,0,0" 
 VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Black"/>
                             <Button Content="Reset" HorizontalAlignment="Left" Height="40" Margin="0,5,0,0" 
 VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSize="18" BorderBrush="Black" Foreground="Black"/>
                         </StackPanel>
-                        <!--Start using //////////////////////////////////////////////////////////////////-->
+                        <!--Start using -->
                         <StackPanel Orientation="Vertical" HorizontalAlignment="Center" VerticalAlignment="Center">
                             <GroupBox Height="100" Width="150" Margin="0,-10,0,5">
                                 <GroupBox.Header>
@@ -242,9 +232,9 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
                     </StackPanel>
                 </StackPanel>
             </GroupBox>
-
-            <!-- StackPanel ichidagi elementlar -->
         </StackPanel>
+
+        <!-- Menu -->
         <Menu Height="20" VerticalAlignment="Top" Background="LightGray">
             <MenuItem Header="File">
                 <MenuItem Header="Load" x:Name="MenuLoad" InputGestureText="Ctrl+L">
@@ -347,14 +337,18 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
                 </MenuItem>
             </MenuItem>
         </Menu>
-        <Canvas Margin="0,20,0,0"  >
+
+        <!-- Radar Screen -->
+        <Canvas Margin="0,20,0,0">
             <!-- Date Time Panel with Border -->
-            <Border BorderBrush="White" BorderThickness="2" Background="Black" Padding="10" Margin="5,20,0,0" >
+            <Border BorderBrush="White" BorderThickness="2" Background="Black" Padding="10" Margin="5,20,0,0">
                 <StackPanel Width="120" Height="40">
                     <Label Content="01.01.2025" x:Name="DateLabel" Foreground="LawnGreen" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"  Margin="0,-10,0,0" />
                     <Label Content="00 : 00 : 00" x:Name="TimeLabel" Foreground="LawnGreen" FontSize="20" FontWeight="Bold" HorizontalAlignment="Center"  Margin="0,-15,0,0" />
                 </StackPanel>
             </Border>
+            
+            
             
             <!-- Radar Circles -->
             <Ellipse Width="400" Height="400" Stroke="Lime" StrokeThickness="1" Canvas.Left="25" Canvas.Top="25" />
@@ -374,9 +368,20 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
                 <Path.RenderTransform>
                     <RotateTransform x:Name="RadarRotation" CenterX="225" CenterY="225" />
                 </Path.RenderTransform>
+                <Path.OpacityMask>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="Transparent" Offset="0"/>
+                        <GradientStop Color="LimeGreen" Offset="0.5"/>
+                        <GradientStop Color="Transparent" Offset="1"/>
+                    </LinearGradientBrush>
+                </Path.OpacityMask>
+                <Path.Effect>
+                    <DropShadowEffect Color="LimeGreen" BlurRadius="10" Direction="0" ShadowDepth="0"/>
+                </Path.Effect>
             </Path>
-            
-            
+
+            <!-- Nishon belgisi -->
+            <Ellipse x:Name="TargetEllipse" Width="20" Height="20" Fill="Red" Canvas.Left="400" Canvas.Top="400"/>
         </Canvas>
     </Grid>
 </Window>

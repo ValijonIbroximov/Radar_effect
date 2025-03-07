@@ -5,19 +5,6 @@
         WindowState="Maximized"
         WindowStyle="None" ResizeMode="NoResize">
 
-    <!-- Trigger for animations -->
-    <Window.Triggers>
-        <EventTrigger RoutedEvent="Window.Loaded">
-            <BeginStoryboard>
-                <Storyboard RepeatBehavior="Forever">
-                    <DoubleAnimation
-                        Storyboard.TargetName="RadarRotation"
-                        Storyboard.TargetProperty="Angle"
-                        From="0" To="360" Duration="0:0:3" />
-                </Storyboard>
-            </BeginStoryboard>
-        </EventTrigger>
-    </Window.Triggers>
 
     <!-- Input bindings for keyboard shortcuts -->
     <Window.InputBindings>
@@ -27,7 +14,7 @@
 
     <Grid>
         <!-- Canvas - Joylashuvni boshqarish uchun qulay -->
-        <Canvas HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,110">
+        <Canvas HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="auto" Height="auto" Margin="0,0,0,110">
             <!-- Eng pastki doira -->
             <Ellipse x:Name="BaseCircle" Width="100" Height="100" Fill="Gray" Stroke="Black" StrokeThickness="2"
                  Canvas.Left="0" Canvas.Top="0"/>
@@ -38,7 +25,7 @@
                 X1="50" Y1="50" X2="50" Y2="50"
                 StrokeStartLineCap="Round"
                 StrokeEndLineCap="Round"/>
-
+            
             <!-- O'rtadagi doira -->
             <Ellipse x:Name="MiddleCircle" Width="30" Height="30" Fill="Black" Stroke="White" StrokeThickness="2"
                  Canvas.Left="35" Canvas.Top="35"/>
@@ -339,7 +326,7 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
         </Menu>
 
         <!-- Radar Screen -->
-        <Canvas Margin="0,20,0,0">
+		<Canvas x:Name="MainCanvas" Margin="0,20,0,0">
             <!-- Date Time Panel with Border -->
             <Border BorderBrush="White" BorderThickness="2" Background="Black" Padding="10" Margin="5,20,0,0">
                 <StackPanel Width="120" Height="40">
@@ -350,17 +337,17 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
             
             
             
-            <!-- Radar Circles -->
+            <!-- Radar Circles --><!--
             <Ellipse Width="400" Height="400" Stroke="Lime" StrokeThickness="1" Canvas.Left="25" Canvas.Top="25" />
             <Ellipse Width="300" Height="300" Stroke="Lime" StrokeThickness="1" Canvas.Left="75" Canvas.Top="75" />
             <Ellipse Width="200" Height="200" Stroke="Lime" StrokeThickness="1" Canvas.Left="125" Canvas.Top="125" />
             <Ellipse Width="100" Height="100" Stroke="Lime" StrokeThickness="1" Canvas.Left="175" Canvas.Top="175" />
 
-            <!-- Cross Lines -->
+            --><!-- Cross Lines --><!--
             <Line X1="225" Y1="25" X2="225" Y2="425" Stroke="Lime" StrokeThickness="1" />
             <Line X1="25" Y1="225" X2="425" Y2="225" Stroke="Lime" StrokeThickness="1" />
 
-            <!-- Radar Sweep -->
+            --><!-- Radar Sweep --><!--
             <Path x:Name="RadarSweep" Fill="LimeGreen" Opacity="0.2">
                 <Path.Data>
                     <PathGeometry Figures="M225,225 L225,25 A200,200,0,0,1,425,225 L225,225"/>
@@ -380,8 +367,8 @@ VerticalAlignment="Center" Width="80" Background="Gray" FontWeight="Bold" FontSi
                 </Path.Effect>
             </Path>
 
-            <!-- Nishon belgisi -->
-            <Ellipse x:Name="TargetEllipse" Width="20" Height="20" Fill="Red" Canvas.Left="400" Canvas.Top="400"/>
+            --><!-- Nishon belgisi --><!--
+            <Ellipse x:Name="TargetEllipse" Width="20" Height="20" Fill="Red" Canvas.Left="400" Canvas.Top="400"/>-->
         </Canvas>
     </Grid>
 </Window>

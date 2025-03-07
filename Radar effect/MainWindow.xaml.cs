@@ -5,6 +5,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Controls;
+using System.Windows.Media.Effects;
 
 namespace Radar_effect
 {
@@ -16,44 +17,181 @@ namespace Radar_effect
         public MainWindow()
         {
             InitializeComponent();
-            CreateRadarAnimation(); // Radar animatsiyasini yaratish
-            CreateTargetAnimation(); // Nishon belgisi animatsiyasini yaratish
+            AddRadarSweep();
+            //CreateRadarAnimation(); // Radar animatsiyasini yaratish
+            //CreateTargetAnimation(); // Nishon belgisi animatsiyasini yaratish
         }
 
-        // Radar animatsiyasini yaratish
-        private void CreateRadarAnimation()
+        private void AddRadarSweep()
         {
-            // Radar animatsiyasi
+            // Canvas o'lchamlarini olish
+            double canvasWidth = MainCanvas.ActualWidth;
+            double canvasHeight = MainCanvas.ActualHeight;
+
+            // Radar markazini aniqlash
+            double radarCenterX = canvasWidth / 1;
+            double radarCenterY = canvasHeight / 2;
+
+            // Radar doiralari radiuslari
+            double outerRadius = 400; // Tashqi doira radiusi
+            double innerRadius = 300; // Ichki doira radiusi
+
+            // Radar Sweep yaratish
+            Path radarSweep = new Path
+            {
+                Fill = Brushes.LimeGreen,
+                Opacity = 0.2
+            };
+
+            // PathGeometry yaratish
+            PathGeometry pathGeometry = new PathGeometry();
+            PathFigure pathFigure = new PathFigure
+            {
+                StartPoint = new Point(radarCenterX, radarCenterY)
+            };
+            pathFigure.Segments.Add(new LineSegment(new Point(radarCenterX, radarCenterY - outerRadius), true));
+            pathFigure.Segments.Add(new ArcSegment(
+                new Point(radarCenterX + outerRadius, radarCenterY),
+                new Size(outerRadius, outerRadius),
+                0, false, SweepDirection.Clockwise, true));
+            pathFigure.Segments.Add(new LineSegment(new Point(radarCenterX, radarCenterY), true));
+            pathGeometry.Figures.Add(pathFigure);
+
+            radarSweep.Data = pathGeometry;
+
+            // RotateTransform qo'shish
+            RotateTransform radarRotation = new RotateTransform
+            {
+                CenterX = radarCenterX,
+                CenterY = radarCenterY
+            };
+            radarSweep.RenderTransform = radarRotation;
+
+            // OpacityMask qo'shish
+            LinearGradientBrush opacityMask = new LinearGradientBrush
+            {
+                StartPoint = new Point(0, 0),
+                EndPoint = new Point(1, 1)
+            };
+            opacityMask.GradientStops.Add(new GradientStop(Colors.Transparent, 0));
+            opacityMask.GradientStops.Add(new GradientStop(Colors.LimeGreen, 0.5));
+            opacityMask.GradientStops.Add(new GradientStop(Colors.Transparent, 1));
+            radarSweep.OpacityMask = opacityMask;
+
+            // DropShadowEffect qo'shish
+            DropShadowEffect dropShadowEffect = new DropShadowEffect
+            {
+                Color = Colors.LimeGreen,
+                BlurRadius = 10,
+                Direction = 0,
+                ShadowDepth = 0
+            };
+            radarSweep.Effect = dropShadowEffect;
+
+            // Radar ni Canvas ga qo'shish
+            MainCanvas.Children.Add(radarSweep);
+
+            // Animatsiyani yaratish
             DoubleAnimation rotationAnimation = new DoubleAnimation
             {
                 From = 0,
                 To = 360,
-                Duration = new Duration(TimeSpan.FromSeconds(5)), // Aylanish davomiyligi
-                RepeatBehavior = RepeatBehavior.Forever // Cheksiz takrorlash
-            };
-
-            // Animatsiyani radar chizig'iga bog'lash
-            RotateTransform radarTransform = (RotateTransform)RadarSweep.RenderTransform;
-            radarTransform.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
-        }
-
-        // Nishon belgisi animatsiyasini yaratish
-        private void CreateTargetAnimation()
-        {
-            // Nishon belgisi animatsiyasi
-            DoubleAnimation targetAnimation = new DoubleAnimation
-            {
-                From = 1,
-                To = 0.5,
-                Duration = new Duration(TimeSpan.FromSeconds(1)),
-                AutoReverse = true,
+                Duration = TimeSpan.FromSeconds(3),
                 RepeatBehavior = RepeatBehavior.Forever
             };
 
-            // Animatsiyani nishon belgisi bilan bog'lash
-            Ellipse target = (Ellipse)FindName("TargetEllipse");
-            target.BeginAnimation(Ellipse.OpacityProperty, targetAnimation);
+            // Animatsiyani boshlash
+            radarRotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
+
+            // Radar doiralarini qo'shish
+            //AddRadarCircles(radarCenterX, radarCenterY, outerRadius, innerRadius);
         }
+
+        //private void AddRadarCircles(double centerX, double centerY, double outerRadius, double innerRadius)
+        //{
+        //    // Tashqi doira
+        //    Ellipse outerCircle = new Ellipse
+        //    {
+        //        Width = outerRadius * 2,
+        //        Height = outerRadius * 2,
+        //        Stroke = Brushes.Lime,
+        //        StrokeThickness = 1
+        //    };
+        //    Canvas.SetLeft(outerCircle, centerX - outerRadius);
+        //    Canvas.SetTop(outerCircle, centerY - outerRadius);
+        //    MainCanvas.Children.Add(outerCircle);
+
+        //    // Ichki doira
+        //    Ellipse innerCircle = new Ellipse
+        //    {
+        //        Width = innerRadius * 2,
+        //        Height = innerRadius * 2,
+        //        Stroke = Brushes.Lime,
+        //        StrokeThickness = 1
+        //    };
+        //    Canvas.SetLeft(innerCircle, centerX - innerRadius);
+        //    Canvas.SetTop(innerCircle, centerY - innerRadius);
+        //    MainCanvas.Children.Add(innerCircle);
+
+        //    // Chiziqlar (krest)
+        //    Line horizontalLine = new Line
+        //    {
+        //        X1 = centerX - outerRadius,
+        //        Y1 = centerY,
+        //        X2 = centerX + outerRadius,
+        //        Y2 = centerY,
+        //        Stroke = Brushes.Lime,
+        //        StrokeThickness = 1
+        //    };
+        //    MainCanvas.Children.Add(horizontalLine);
+
+        //    Line verticalLine = new Line
+        //    {
+        //        X1 = centerX,
+        //        Y1 = centerY - outerRadius,
+        //        X2 = centerX,
+        //        Y2 = centerY + outerRadius,
+        //        Stroke = Brushes.Lime,
+        //        StrokeThickness = 1
+        //    };
+        //    MainCanvas.Children.Add(verticalLine);
+        //}
+
+
+        // Radar animatsiyasini yaratish
+        //private void CreateRadarAnimation()
+        //{
+        //    // Radar animatsiyasi
+        //    DoubleAnimation rotationAnimation = new DoubleAnimation
+        //    {
+        //        From = 0,
+        //        To = 360,
+        //        Duration = new Duration(TimeSpan.FromSeconds(5)), // Aylanish davomiyligi
+        //        RepeatBehavior = RepeatBehavior.Forever // Cheksiz takrorlash
+        //    };
+
+        //    // Animatsiyani radar chizig'iga bog'lash
+        //    RotateTransform radarTransform = (RotateTransform)RadarSweep.RenderTransform;
+        //    radarTransform.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
+        //}
+
+        // Nishon belgisi animatsiyasini yaratish
+        //private void CreateTargetAnimation()
+        //{
+        //    // Nishon belgisi animatsiyasi
+        //    DoubleAnimation targetAnimation = new DoubleAnimation
+        //    {
+        //        From = 1,
+        //        To = 0.5,
+        //        Duration = new Duration(TimeSpan.FromSeconds(1)),
+        //        AutoReverse = true,
+        //        RepeatBehavior = RepeatBehavior.Forever
+        //    };
+
+        //    // Animatsiyani nishon belgisi bilan bog'lash
+        //    Ellipse target = (Ellipse)FindName("TargetEllipse");
+        //    target.BeginAnimation(Ellipse.OpacityProperty, targetAnimation);
+        //}
 
         // Doirani boshlab sudrab olish
         private void TopCircle_MouseDown(object sender, MouseButtonEventArgs e)

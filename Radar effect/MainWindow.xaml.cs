@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media;
@@ -6,92 +7,177 @@ using System.Windows.Media.Animation;
 using System.Windows.Shapes;
 using System.Windows.Controls;
 using System.Windows.Media.Effects;
+using System.Windows.Threading;
 
 namespace Radar_effect
 {
     public partial class MainWindow : Window
     {
-        private bool isDragging = false; // Doirani sudrab olish holati
-        private Point mouseOffset; // Sichqoncha bosilgan joy
+        private bool isDragging = false;
+        private Point mouseOffset;
+
+        // Radar parametrlari
+        private double baseRadarCenterX;
+        private double baseRadarCenterY;
+        private double radarRadius = 400;
+
+        // Nishonlar ro'yxati
+        private List<Canvas> targets = new List<Canvas>();
+        private DispatcherTimer targetTimer;
+        private Random random = new Random();
+
+        // Kamera (Joystik) taymeri va vektorlar
+        private DispatcherTimer cameraTimer;
+        private double joystickVectorX = 0;
+        private double joystickVectorY = 0;
+
+        // Professional ranglar palitrasi
+        private SolidColorBrush pitchBlack = new SolidColorBrush(Colors.Black);
+        private SolidColorBrush darkPhosphorGreen = new SolidColorBrush(Color.FromRgb(2, 20, 2));
+        private SolidColorBrush gridGreen = new SolidColorBrush(Color.FromRgb(20, 70, 20));
+        private SolidColorBrush brightPhosphorGreen = new SolidColorBrush(Color.FromRgb(57, 255, 20));
+        private SolidColorBrush alertRed = new SolidColorBrush(Color.FromRgb(255, 60, 60));
+        private FontFamily techFont = new FontFamily("Consolas");
 
         public MainWindow()
         {
             InitializeComponent();
-            AddRadarSweep();
-            //CreateRadarAnimation(); // Radar animatsiyasini yaratish
-            //CreateTargetAnimation(); // Nishon belgisi animatsiyasini yaratish
+            this.Loaded += MainWindow_Loaded;
         }
 
-        private void AddRadarSweep()
+        private void MainWindow_Loaded(object sender, RoutedEventArgs e)
         {
-            // Canvas o'lchamlarini olish
-            double canvasWidth = MainCanvas.ActualWidth;
-            double canvasHeight = MainCanvas.ActualHeight;
+            // Oq fon chiqib qolmasligi uchun Canvasni to'liq qora qilamiz
+            MainCanvas.Background = pitchBlack;
 
-            // Radar markazini aniqlash
-            double radarCenterX = canvasWidth / 1;
-            double radarCenterY = canvasHeight / 2;
+            DrawHighEndRadarSystem();
+            StartTargetSimulation();
+            StartCameraMovementTimer();
+        }
 
-            // Radar doiralari radiuslari
-            double outerRadius = 400; // Tashqi doira radiusi
-            double innerRadius = 300; // Ichki doira radiusi
+        private void DrawHighEndRadarSystem()
+        {
+            baseRadarCenterX = MainCanvas.ActualWidth / 2;
+            baseRadarCenterY = MainCanvas.ActualHeight / 2;
 
-            // Radar Sweep yaratish
-            Path radarSweep = new Path
+            // 1. Asosiy radar orqa foni (Qop-qora va to'q yashil)
+            Ellipse radarBackground = new Ellipse
             {
-                Fill = Brushes.LimeGreen,
-                Opacity = 0.2
+                Width = radarRadius * 2,
+                Height = radarRadius * 2,
+                Fill = darkPhosphorGreen,
+                Stroke = brightPhosphorGreen,
+                StrokeThickness = 2
             };
+            Canvas.SetLeft(radarBackground, baseRadarCenterX - radarRadius);
+            Canvas.SetTop(radarBackground, baseRadarCenterY - radarRadius);
+            RadarContainer.Children.Add(radarBackground);
 
-            // PathGeometry yaratish
-            PathGeometry pathGeometry = new PathGeometry();
-            PathFigure pathFigure = new PathFigure
+            // 2. Mayda o'lchov panjarasi (Polar Grid)
+            for (int i = 1; i <= 8; i++) // 8 ta masofa halqasi
             {
-                StartPoint = new Point(radarCenterX, radarCenterY)
-            };
-            pathFigure.Segments.Add(new LineSegment(new Point(radarCenterX, radarCenterY - outerRadius), true));
-            pathFigure.Segments.Add(new ArcSegment(
-                new Point(radarCenterX + outerRadius, radarCenterY),
-                new Size(outerRadius, outerRadius),
-                0, false, SweepDirection.Clockwise, true));
-            pathFigure.Segments.Add(new LineSegment(new Point(radarCenterX, radarCenterY), true));
-            pathGeometry.Figures.Add(pathFigure);
+                double currentRadius = radarRadius * (i / 8.0);
+                Ellipse ring = new Ellipse
+                {
+                    Width = currentRadius * 2,
+                    Height = currentRadius * 2,
+                    Stroke = gridGreen,
+                    StrokeThickness = (i % 2 == 0) ? 1.5 : 0.5, // Har ikkinchi halqa qalinroq
+                    StrokeDashArray = (i % 2 == 0) ? null : new DoubleCollection { 4, 4 }
+                };
+                Canvas.SetLeft(ring, baseRadarCenterX - currentRadius);
+                Canvas.SetTop(ring, baseRadarCenterY - currentRadius);
+                RadarContainer.Children.Add(ring);
+            }
 
-            radarSweep.Data = pathGeometry;
-
-            // RotateTransform qo'shish
-            RotateTransform radarRotation = new RotateTransform
+            // 3. Azimut chiziqlari (Har 10 va 30 gradusda)
+            for (int i = 0; i < 360; i += 10)
             {
-                CenterX = radarCenterX,
-                CenterY = radarCenterY
-            };
-            radarSweep.RenderTransform = radarRotation;
+                bool isMajor = (i % 30 == 0);
+                double rad = i * Math.PI / 180;
 
-            // OpacityMask qo'shish
-            LinearGradientBrush opacityMask = new LinearGradientBrush
+                // Kichik chiziqchalar (Tick marks) chegarada
+                double innerTick = isMajor ? radarRadius - 15 : radarRadius - 5;
+                Point p1 = new Point(baseRadarCenterX + innerTick * Math.Cos(rad), baseRadarCenterY + innerTick * Math.Sin(rad));
+                Point p2 = new Point(baseRadarCenterX + radarRadius * Math.Cos(rad), baseRadarCenterY + radarRadius * Math.Sin(rad));
+
+                Line tickLine = new Line { X1 = p1.X, Y1 = p1.Y, X2 = p2.X, Y2 = p2.Y, Stroke = brightPhosphorGreen, StrokeThickness = isMajor ? 2 : 1 };
+                RadarContainer.Children.Add(tickLine);
+
+                // Asosiy kesib o'tuvchi chiziqlar va matnlar
+                if (isMajor)
+                {
+                    Line azLine = new Line
+                    {
+                        X1 = baseRadarCenterX,
+                        Y1 = baseRadarCenterY,
+                        X2 = baseRadarCenterX + radarRadius * Math.Cos(rad),
+                        Y2 = baseRadarCenterY + radarRadius * Math.Sin(rad),
+                        Stroke = gridGreen,
+                        StrokeThickness = 1
+                    };
+                    RadarContainer.Children.Add(azLine);
+
+                    TextBlock degreeText = new TextBlock
+                    {
+                        Text = i.ToString("000"),
+                        Foreground = brightPhosphorGreen,
+                        FontFamily = techFont,
+                        FontSize = 12,
+                        FontWeight = FontWeights.Bold
+                    };
+                    double textX = baseRadarCenterX + (radarRadius + 20) * Math.Cos(rad) - 10;
+                    double textY = baseRadarCenterY + (radarRadius + 20) * Math.Sin(rad) - 8;
+                    Canvas.SetLeft(degreeText, textX);
+                    Canvas.SetTop(degreeText, textY);
+                    RadarContainer.Children.Add(degreeText);
+                }
+            }
+
+            // 4. Markaziy Reticle (O'qotar/Kuzatuv mo'ljali)
+            Path centralCross = new Path { Stroke = brightPhosphorGreen, StrokeThickness = 2 };
+            PathGeometry crossGeom = new PathGeometry();
+            crossGeom.Figures.Add(new PathFigure(new Point(baseRadarCenterX - 20, baseRadarCenterY), new[] { new LineSegment(new Point(baseRadarCenterX + 20, baseRadarCenterY), true) }, false));
+            crossGeom.Figures.Add(new PathFigure(new Point(baseRadarCenterX, baseRadarCenterY - 20), new[] { new LineSegment(new Point(baseRadarCenterX, baseRadarCenterY + 20), true) }, false));
+            centralCross.Data = crossGeom;
+            RadarContainer.Children.Add(centralCross);
+
+            // 5. HAQIQIY FOSFOR SWEEP (120 ta uzluksiz kesma yordamida o'ta silliq gradient)
+            Canvas sweepContainer = new Canvas();
+
+            // So'nuvchi dum (120 gradus)
+            for (int i = 0; i < 120; i++)
             {
-                StartPoint = new Point(0, 0),
-                EndPoint = new Point(1, 1)
-            };
-            opacityMask.GradientStops.Add(new GradientStop(Colors.Transparent, 0));
-            opacityMask.GradientStops.Add(new GradientStop(Colors.LimeGreen, 0.5));
-            opacityMask.GradientStops.Add(new GradientStop(Colors.Transparent, 1));
-            radarSweep.OpacityMask = opacityMask;
+                double startAngle = -i;
+                double endAngle = -(i + 1.5); // Oraliqda oq chiziq qolmasligi uchun biroz ustma-ust tushadi
 
-            // DropShadowEffect qo'shish
-            DropShadowEffect dropShadowEffect = new DropShadowEffect
+                Path wedge = CreateWedge(baseRadarCenterX, baseRadarCenterY, radarRadius, startAngle, endAngle);
+                wedge.Fill = brightPhosphorGreen;
+                // Haqiqiy radarlardek eksponensial so'nish qonuniyati
+                wedge.Opacity = Math.Pow((120.0 - i) / 120.0, 3) * 0.7;
+
+                sweepContainer.Children.Add(wedge);
+            }
+
+            // Nurning o'tkir kesuvchi old qismi (Leading edge)
+            Line leadingEdge = new Line
             {
-                Color = Colors.LimeGreen,
-                BlurRadius = 10,
-                Direction = 0,
-                ShadowDepth = 0
+                X1 = baseRadarCenterX,
+                Y1 = baseRadarCenterY,
+                X2 = baseRadarCenterX,
+                Y2 = baseRadarCenterY - radarRadius, // Tepaga qarab (0 gradus)
+                Stroke = new SolidColorBrush(Colors.White), // Yadrosi oq
+                StrokeThickness = 2,
+                Effect = new DropShadowEffect { Color = Colors.LimeGreen, BlurRadius = 15, ShadowDepth = 0 } // Kuchli yashil porlash
             };
-            radarSweep.Effect = dropShadowEffect;
+            sweepContainer.Children.Add(leadingEdge);
 
-            // Radar ni Canvas ga qo'shish
-            MainCanvas.Children.Add(radarSweep);
+            // Aylanuvchi konteynerni sozlash
+            RotateTransform radarRotation = new RotateTransform { CenterX = baseRadarCenterX, CenterY = baseRadarCenterY };
+            sweepContainer.RenderTransform = radarRotation;
+            RadarContainer.Children.Add(sweepContainer);
 
-            // Animatsiyani yaratish
+            // 3 soniyada 360 gradus aylanadi
             DoubleAnimation rotationAnimation = new DoubleAnimation
             {
                 From = 0,
@@ -99,101 +185,136 @@ namespace Radar_effect
                 Duration = TimeSpan.FromSeconds(3),
                 RepeatBehavior = RepeatBehavior.Forever
             };
-
-            // Animatsiyani boshlash
             radarRotation.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
-
-            // Radar doiralarini qo'shish
-            //AddRadarCircles(radarCenterX, radarCenterY, outerRadius, innerRadius);
         }
 
-        //private void AddRadarCircles(double centerX, double centerY, double outerRadius, double innerRadius)
-        //{
-        //    // Tashqi doira
-        //    Ellipse outerCircle = new Ellipse
-        //    {
-        //        Width = outerRadius * 2,
-        //        Height = outerRadius * 2,
-        //        Stroke = Brushes.Lime,
-        //        StrokeThickness = 1
-        //    };
-        //    Canvas.SetLeft(outerCircle, centerX - outerRadius);
-        //    Canvas.SetTop(outerCircle, centerY - outerRadius);
-        //    MainCanvas.Children.Add(outerCircle);
+        // Sector (Wedge) chizish uchun yordamchi matematik funksiya
+        private Path CreateWedge(double cx, double cy, double radius, double startAngle, double endAngle)
+        {
+            // Burchakni radianlarga o'tkazish (-90 gradus tepadan boshlanishi uchun)
+            double startRad = (startAngle - 90) * Math.PI / 180.0;
+            double endRad = (endAngle - 90) * Math.PI / 180.0;
 
-        //    // Ichki doira
-        //    Ellipse innerCircle = new Ellipse
-        //    {
-        //        Width = innerRadius * 2,
-        //        Height = innerRadius * 2,
-        //        Stroke = Brushes.Lime,
-        //        StrokeThickness = 1
-        //    };
-        //    Canvas.SetLeft(innerCircle, centerX - innerRadius);
-        //    Canvas.SetTop(innerCircle, centerY - innerRadius);
-        //    MainCanvas.Children.Add(innerCircle);
+            Point p1 = new Point(cx + radius * Math.Cos(startRad), cy + radius * Math.Sin(startRad));
+            Point p2 = new Point(cx + radius * Math.Cos(endRad), cy + radius * Math.Sin(endRad));
 
-        //    // Chiziqlar (krest)
-        //    Line horizontalLine = new Line
-        //    {
-        //        X1 = centerX - outerRadius,
-        //        Y1 = centerY,
-        //        X2 = centerX + outerRadius,
-        //        Y2 = centerY,
-        //        Stroke = Brushes.Lime,
-        //        StrokeThickness = 1
-        //    };
-        //    MainCanvas.Children.Add(horizontalLine);
+            PathGeometry geom = new PathGeometry();
+            PathFigure fig = new PathFigure { StartPoint = new Point(cx, cy), IsClosed = true };
+            fig.Segments.Add(new LineSegment(p1, false));
+            fig.Segments.Add(new ArcSegment(p2, new Size(radius, radius), 0, false, SweepDirection.Counterclockwise, false));
+            geom.Figures.Add(fig);
 
-        //    Line verticalLine = new Line
-        //    {
-        //        X1 = centerX,
-        //        Y1 = centerY - outerRadius,
-        //        X2 = centerX,
-        //        Y2 = centerY + outerRadius,
-        //        Stroke = Brushes.Lime,
-        //        StrokeThickness = 1
-        //    };
-        //    MainCanvas.Children.Add(verticalLine);
-        //}
+            return new Path { Data = geom };
+        }
 
+        // --- NISHONLAR IMITATSIYASI ---
+        private void StartTargetSimulation()
+        {
+            for (int i = 0; i < 6; i++) GenerateProfessionalTarget();
 
-        // Radar animatsiyasini yaratish
-        //private void CreateRadarAnimation()
-        //{
-        //    // Radar animatsiyasi
-        //    DoubleAnimation rotationAnimation = new DoubleAnimation
-        //    {
-        //        From = 0,
-        //        To = 360,
-        //        Duration = new Duration(TimeSpan.FromSeconds(5)), // Aylanish davomiyligi
-        //        RepeatBehavior = RepeatBehavior.Forever // Cheksiz takrorlash
-        //    };
+            targetTimer = new DispatcherTimer();
+            targetTimer.Interval = TimeSpan.FromSeconds(1.5);
+            targetTimer.Tick += (s, e) =>
+            {
+                if (random.NextDouble() > 0.7 && targets.Count < 15) GenerateProfessionalTarget();
 
-        //    // Animatsiyani radar chizig'iga bog'lash
-        //    RotateTransform radarTransform = (RotateTransform)RadarSweep.RenderTransform;
-        //    radarTransform.BeginAnimation(RotateTransform.AngleProperty, rotationAnimation);
-        //}
+                foreach (var target in targets)
+                {
+                    double currentLeft = Canvas.GetLeft(target);
+                    double currentTop = Canvas.GetTop(target);
+                    Canvas.SetLeft(target, currentLeft + (random.NextDouble() - 0.5) * 8);
+                    Canvas.SetTop(target, currentTop + (random.NextDouble() - 0.5) * 8);
+                }
+            };
+            targetTimer.Start();
+        }
 
-        // Nishon belgisi animatsiyasini yaratish
-        //private void CreateTargetAnimation()
-        //{
-        //    // Nishon belgisi animatsiyasi
-        //    DoubleAnimation targetAnimation = new DoubleAnimation
-        //    {
-        //        From = 1,
-        //        To = 0.5,
-        //        Duration = new Duration(TimeSpan.FromSeconds(1)),
-        //        AutoReverse = true,
-        //        RepeatBehavior = RepeatBehavior.Forever
-        //    };
+        private void GenerateProfessionalTarget()
+        {
+            double angle = random.NextDouble() * 2 * Math.PI;
+            double distance = random.NextDouble() * (radarRadius - 60);
+            double x = baseRadarCenterX + distance * Math.Cos(angle);
+            double y = baseRadarCenterY + distance * Math.Sin(angle);
 
-        //    // Animatsiyani nishon belgisi bilan bog'lash
-        //    Ellipse target = (Ellipse)FindName("TargetEllipse");
-        //    target.BeginAnimation(Ellipse.OpacityProperty, targetAnimation);
-        //}
+            Canvas targetCanvas = new Canvas();
 
-        // Doirani boshlab sudrab olish
+            // Nishon vizuali - Harbiy ko'rinishdagi markaziy xoch va kvadrat
+            Rectangle blip = new Rectangle
+            {
+                Width = 10,
+                Height = 10,
+                Stroke = alertRed,
+                StrokeThickness = 2,
+                Fill = new SolidColorBrush(Color.FromArgb(100, 255, 0, 0)),
+                Effect = new DropShadowEffect { Color = Colors.Red, BlurRadius = 15, ShadowDepth = 0 }
+            };
+            Canvas.SetLeft(blip, -5); Canvas.SetTop(blip, -5);
+
+            // Data yorlig'i (Texnik ma'lumotlar)
+            string targetId = "TRG-" + random.Next(1000, 9999);
+            string alt = "FL" + random.Next(150, 450); // Flight Level
+            string spd = "SPD " + random.Next(300, 950);
+
+            TextBlock dataTag = new TextBlock
+            {
+                Text = $"{targetId}\n{alt} {spd}",
+                Foreground = alertRed,
+                FontFamily = techFont,
+                FontSize = 11,
+                LineHeight = 14,
+                Opacity = 0.9
+            };
+
+            Line tagConnector = new Line { X1 = 5, Y1 = -5, X2 = 25, Y2 = -25, Stroke = alertRed, StrokeThickness = 1, Opacity = 0.6 };
+            Canvas.SetLeft(dataTag, 30); Canvas.SetTop(dataTag, -35);
+
+            targetCanvas.Children.Add(tagConnector);
+            targetCanvas.Children.Add(blip);
+            targetCanvas.Children.Add(dataTag);
+
+            Canvas.SetLeft(targetCanvas, x); Canvas.SetTop(targetCanvas, y);
+
+            // Pulsatsiyalovchi animatsiya
+            DoubleAnimation blink = new DoubleAnimation { From = 1.0, To = 0.5, Duration = TimeSpan.FromSeconds(1), AutoReverse = true, RepeatBehavior = RepeatBehavior.Forever };
+            targetCanvas.BeginAnimation(Canvas.OpacityProperty, blink);
+
+            targets.Add(targetCanvas);
+            RadarContainer.Children.Add(targetCanvas);
+        }
+
+        // ==========================================
+        // JOSTIK VA KAMERA HARAKATI MANTIQI
+        // ==========================================
+
+        private void StartCameraMovementTimer()
+        {
+            cameraTimer = new DispatcherTimer();
+            cameraTimer.Interval = TimeSpan.FromMilliseconds(16);
+            cameraTimer.Tick += (s, e) =>
+            {
+                if (joystickVectorX == 0 && joystickVectorY == 0) return;
+
+                double maxSpeed = 15.0;
+                double nextX = RadarTranslate.X - (joystickVectorX * maxSpeed);
+                double nextY = RadarTranslate.Y - (joystickVectorY * maxSpeed);
+
+                double maxPanX = MainCanvas.ActualWidth / 1.5;
+                double maxPanY = MainCanvas.ActualHeight / 1.5;
+
+                if (nextX > maxPanX) nextX = maxPanX;
+                if (nextX < -maxPanX) nextX = -maxPanX;
+                if (nextY > maxPanY) nextY = maxPanY;
+                if (nextY < -maxPanY) nextY = -maxPanY;
+
+                if (RadarTranslate != null)
+                {
+                    RadarTranslate.X = nextX;
+                    RadarTranslate.Y = nextY;
+                }
+            };
+            cameraTimer.Start();
+        }
+
         private void TopCircle_MouseDown(object sender, MouseButtonEventArgs e)
         {
             isDragging = true;
@@ -201,7 +322,6 @@ namespace Radar_effect
             ((Ellipse)sender).CaptureMouse();
         }
 
-        // Doirani sudrab harakatlantirish
         private void TopCircle_MouseMove(object sender, MouseEventArgs e)
         {
             if (!isDragging) return;
@@ -213,11 +333,11 @@ namespace Radar_effect
             double newLeft = Canvas.GetLeft(TopCircle) + offsetX;
             double newTop = Canvas.GetTop(TopCircle) + offsetY;
 
-            // Doiraning markazi 1-doira ichida qolishini ta'minlash
             double centerX = newLeft + TopCircle.Width / 2;
             double centerY = newTop + TopCircle.Height / 2;
-            double baseCenterX = Canvas.GetLeft(BaseCircle) + BaseCircle.Width / 2;
-            double baseCenterY = Canvas.GetTop(BaseCircle) + BaseCircle.Height / 2;
+
+            double baseCenterX = 50;
+            double baseCenterY = 50;
             double radius = BaseCircle.Width / 2 - TopCircle.Width / 2;
 
             double distance = Math.Sqrt(Math.Pow(centerX - baseCenterX, 2) + Math.Pow(centerY - baseCenterY, 2));
@@ -231,39 +351,33 @@ namespace Radar_effect
                 newTop = centerY - TopCircle.Height / 2;
             }
 
-            Canvas.SetLeft(TopCircle, newLeft);
-            Canvas.SetTop(TopCircle, newTop);
+            Canvas.SetLeft(TopCircle, newLeft); Canvas.SetTop(TopCircle, newTop);
+            Canvas.SetLeft(MiddleCircle, (centerX + baseCenterX) / 2 - MiddleCircle.Width / 2);
+            Canvas.SetTop(MiddleCircle, (centerY + baseCenterY) / 2 - MiddleCircle.Height / 2);
 
-            // 2-doirani 1-va 3-doira o'rtasiga joylashtirish
-            double midX = (centerX + baseCenterX) / 2;
-            double midY = (centerY + baseCenterY) / 2;
-            Canvas.SetLeft(MiddleCircle, midX - MiddleCircle.Width / 2);
-            Canvas.SetTop(MiddleCircle, midY - MiddleCircle.Height / 2);
+            ConnectingLine.X1 = baseCenterX; ConnectingLine.Y1 = baseCenterY;
+            ConnectingLine.X2 = centerX; ConnectingLine.Y2 = centerY;
 
-            // Chiziq koordinatalarini yangilash
-            ConnectingLine.X1 = baseCenterX;
-            ConnectingLine.Y1 = baseCenterY;
-            ConnectingLine.X2 = centerX;
-            ConnectingLine.Y2 = centerY;
+            joystickVectorX = (centerX - baseCenterX) / radius;
+            joystickVectorY = (centerY - baseCenterY) / radius;
         }
 
-        // Doirani sudrab olishni to'xtatish
         private void TopCircle_MouseUp(object sender, MouseButtonEventArgs e)
         {
             isDragging = false;
             ((Ellipse)sender).ReleaseMouseCapture();
+
+            Canvas.SetLeft(TopCircle, 35); Canvas.SetTop(TopCircle, 35);
+            Canvas.SetLeft(MiddleCircle, 35); Canvas.SetTop(MiddleCircle, 35);
+
+            ConnectingLine.X1 = 50; ConnectingLine.Y1 = 50;
+            ConnectingLine.X2 = 50; ConnectingLine.Y2 = 50;
+
+            joystickVectorX = 0;
+            joystickVectorY = 0;
         }
 
-        // Dasturni yopish
-        private void MenuQuit_Click(object sender, RoutedEventArgs e)
-        {
-            this.Close();
-        }
-
-        // RadioButton bosilganda ishlaydigan metod
-        private void RadioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            // Bu metodni kerakli funksiyalar bilan to'ldiring
-        }
+        private void MenuQuit_Click(object sender, RoutedEventArgs e) { this.Close(); }
+        private void RadioButton_Checked(object sender, RoutedEventArgs e) { }
     }
 }
